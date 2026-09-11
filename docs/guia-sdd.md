@@ -169,24 +169,74 @@ No hace falta que `specify check` encuentre todos los agentes que enumera. En es
 
 ### Qué carpetas son infraestructura y cuáles contendrán tu trabajo
 
+**Estructura actual comprobada en `C:\dev\sightpause`:** el árbol siguiente muestra carpetas y archivos que ya existen. Se omite el contenido de las carpetas marcadas con `…`. No es la estructura final de la extensión.
+
 ```text
 sightpause/
-├── .agents/skills/             Instrucciones de las fases y comandos Git
+├── .agents/
+│   └── skills/                  Skills de las fases y comandos Git
+│       └── …
+├── .git/                        Historial Git local (carpeta oculta)
+│   └── …
 ├── .specify/
-│   ├── init-options.json       Opciones de la inicialización
-│   ├── integration.json        Integraciones y configuración registrada
-│   ├── integrations/           Inventarios y hashes de archivos gestionados
-│   ├── extensions.yml          Registro de extensiones y hooks
-│   ├── extensions/git/         Extensión Git y git-config.yml
-│   ├── scripts/bash/           Scripts auxiliares instalados
-│   ├── templates/              Moldes para documentos
-│   ├── memory/constitution.md  Principios del proyecto, aún pendientes
-│   └── workflows/              Flujos automatizados disponibles
-├── docs/guia-sdd.md            Este tutorial
-└── specs/                     Se creará al especificar una funcionalidad
+│   ├── extensions/
+│   │   ├── .registry            Registro de extensiones instaladas
+│   │   └── git/
+│   │       ├── commands/
+│   │       │   └── …
+│   │       ├── scripts/
+│   │       │   ├── bash/
+│   │       │   │   └── …
+│   │       │   ├── powershell/
+│   │       │   │   └── …
+│   │       │   └── python/
+│   │       │       └── …
+│   │       ├── config-template.yml
+│   │       ├── extension.yml
+│   │       ├── git-config.yml   Configuración de la extensión Git
+│   │       └── README.md
+│   ├── integrations/
+│   │   ├── codex.manifest.json
+│   │   └── speckit.manifest.json
+│   ├── memory/
+│   │   ├── .constitution-template.json
+│   │   └── constitution.md      Principios del proyecto, aún pendientes
+│   ├── scripts/
+│   │   └── bash/                Scripts del núcleo seleccionados: sh
+│   │       └── …
+│   ├── templates/               Moldes para los documentos
+│   │   └── …
+│   ├── workflows/
+│   │   ├── speckit/
+│   │   │   └── workflow.yml
+│   │   └── workflow-registry.json
+│   ├── .gitignore
+│   ├── extensions.yml           Configuración de extensiones y hooks
+│   ├── init-options.json        Opciones y versión registradas
+│   └── integration.json         Integración y configuración registrada
+├── docs/
+│   └── guia-sdd.md               Este tutorial
+└── .gitignore
 ```
 
-La constitución real se escribe en `.specify/memory/constitution.md`; los moldes de `.specify/templates/` no se rellenan como si fueran las especificaciones de SightPause. La [skill de planificación instalada](../.agents/skills/speckit-plan/SKILL.md) explica cómo se generan los documentos de diseño de cada funcionalidad.
+En un árbol abreviado, `.agents/skills/` significa una carpeta `skills` dentro de `.agents`; no es una carpeta con ese nombre completo. Lo mismo ocurre con `scripts/bash/` o `memory/constitution.md`. Algunos exploradores agrupan esos niveles en una sola línea. Además, `.git` puede no verse si el explorador oculta carpetas ocultas. Para consultar el árbol local desde PowerShell puedes ejecutar `Get-ChildItem -Force` y `tree /F /A .specify`.
+
+**Qué pertenece a cada parte:** `.agents/` y la mayor parte de `.specify/` son infraestructura de Spec Kit. Dentro de ella, `.specify/memory/constitution.md` es el documento de principios que sí completarás para SightPause; los moldes de `.specify/templates/` no se rellenan como si fueran las especificaciones del producto. `docs/` contiene documentación propia y `.git/` guarda el historial del repositorio. La extensión Git distribuye scripts para Bash, PowerShell y Python, aunque el núcleo de este proyecto esté configurado con `script: sh`; ver esas tres carpetas no indica una configuración incorrecta.
+
+**Lo que se creará después:** actualmente no existen `specs/` ni `.specify/feature.json`. Al ejecutar `$speckit-specify` para la primera funcionalidad, se creará una estructura como esta; `001-nombre-funcionalidad` es un nombre ilustrativo:
+
+```text
+sightpause/
+├── .specify/
+│   └── feature.json              Puntero a la funcionalidad activa
+└── specs/
+    └── 001-nombre-funcionalidad/
+        ├── spec.md               Requisitos de esa funcionalidad
+        └── checklists/
+            └── requirements.md   Revisión de calidad de la especificación
+```
+
+Este segundo árbol muestra solo las incorporaciones, no sustituye al anterior. Después, `$speckit-plan` añadirá `plan.md` y los documentos de diseño que correspondan, y `$speckit-tasks` añadirá `tasks.md` dentro de la funcionalidad. La [skill de planificación instalada](../.agents/skills/speckit-plan/SKILL.md) explica esa generación. La ubicación del código de la extensión y sus pruebas se decidirá en el plan; todavía no hay una estructura final del producto que debas reproducir manualmente.
 
 ### Windows: elegir el Bash correcto
 
