@@ -1,12 +1,12 @@
 # Aprender SDD con SightPause: de la idea a la primera extensión
 
-Tutorial práctico en español · Entorno revisado: **8 de septiembre de 2026** · Fuentes externas consultadas: **7 de septiembre de 2026**.
+Tutorial práctico en español · Entorno revisado: **15 de septiembre de 2026** · Fuentes externas consultadas: **15 de septiembre de 2026**.
 
 Esta guía está escrita para alguien que nunca ha usado desarrollo guiado por especificaciones (SDD). Aprenderás a convertir una idea en requisitos, trabajar con un agente de IA, revisar sus resultados y hacer una segunda iteración sin perder las decisiones de la primera.
 
 El ejemplo es **SightPause**, una extensión Chromium que recuerda hacer descansos visuales mediante una notificación y un pequeño panel, llamado *popup*. Se propone una interfaz minimalista, bonita y accesible con HTML, CSS y JavaScript.
 
-**Estado del proyecto en esta revisión:** la CLI y los archivos de Spec Kit están en **1.0.4**, con la integración verificada; todavía no hay una extensión implementada ni una especificación de funcionalidad. Los prompts, requisitos y árboles futuros de este documento son ejemplos para construirla. Se ha actualizado la infraestructura y comprobado el flujo básico de scripts en una copia temporal; el desarrollo de SightPause sigue pendiente.
+**Estado del proyecto en esta revisión:** la CLI y los archivos de Spec Kit están en **1.0.7**, con la integración Codex verificada; todavía no hay una extensión implementada ni una especificación de funcionalidad. Los prompts, requisitos y árboles futuros de este documento son ejemplos para construirla. Se ha actualizado la infraestructura y comprobado el flujo básico de scripts; el desarrollo de SightPause sigue pendiente.
 
 ## Índice
 
@@ -148,21 +148,21 @@ Get-Content .specify/integration.json
 
 ### Estado verificado tras la actualización
 
-Esta tabla refleja la comprobación del 08/09/2026, después de actualizar los archivos de Spec Kit y antes de editar esta revisión de la guía. Si ejecutas el tutorial después de cambiar el proyecto, tu salida puede ser distinta.
+Esta tabla refleja la comprobación del 15/09/2026, después de actualizar Spec Kit a 1.0.7. Si ejecutas el tutorial después de cambiar el proyecto, tu salida puede ser distinta.
 
 | Elemento | Estado observado |
 |---|---|
-| Rama y commit | `main`; `f4c7ec1 upgrade Spec Kit project files to v1.0.4`; árbol Git limpio antes de esta revisión documental |
+| Rama y commit | `main`; la infraestructura de Spec Kit está actualizada localmente a 1.0.7; revisa el diff antes de crear el commit correspondiente |
 | Remoto | `https://github.com/rublaman/sightpause.git` |
-| CLI | Specify 1.0.4, instalada mediante uv |
-| Integración e infraestructura | Codex y archivos compartidos en 1.0.4; skills habilitadas |
+| CLI | Specify 1.0.7, instalada persistentemente mediante `uv tool install` |
+| Integración e infraestructura | Codex y archivos compartidos en 1.0.7; skills habilitadas |
 | Extensión Git | Git Branching Workflow 1.0.0, habilitada, 5 comandos y 18 hooks |
 | Auto-commit | `auto_commit.default: false` y todos los eventos desactivados en `git-config.yml` |
 | Scripts del núcleo | Bash, selección `script: sh` |
 | Constitución | Plantilla con campos pendientes |
 | Funcionalidad activa | No existe todavía `.specify/feature.json` |
 | Producto | No existen `specs/`, código de extensión ni pruebas |
-| Herramientas auxiliares | Git Bash, Python 3.13, uv y Node 24.19.0 disponibles; npm no localizado en esta sesión |
+| Herramientas auxiliares | Git Bash 5.3, Python 3.13.15 y uv 0.12.15 disponibles; Node 24.19.0 y pnpm 11.19 están disponibles desde el runtime de Codex |
 | Diagnóstico de integración | `OK`; 0 archivos gestionados modificados, 0 ausentes y 0 rutas inválidas |
 
 No hace falta que `specify check` encuentre todos los agentes que enumera. En este proyecto importa la integración Codex y las herramientas que utilicen sus scripts. Ese comando no prueba el funcionamiento de la futura extensión.
@@ -269,11 +269,11 @@ de generar documentos. No cambies el tipo de scripts durante este tutorial.
 
 ### CLI, archivos del proyecto y extensión Git
 
-La CLI es el programa que ejecutas al escribir `specify`. Los archivos del proyecto son copias que se instalaron al preparar el repositorio. Puedes actualizar la CLI y conservar esas copias anteriores: ese era el estado del 07/09/2026, con CLI 1.0.4 y archivos 1.0.1. El 08/09/2026 se actualizaron también los archivos a 1.0.4. La versión 1.0.0 de la extensión Git tiene su propia numeración y se conserva.
+La CLI es el programa que ejecutas al escribir `specify`. Se instala de forma aislada con `uv tool install`, que deja `specify.exe` en `C:\Users\ruben\.local\bin`; esa carpeta debe estar en el `PATH` de usuario. Los archivos del proyecto son copias que se instalan al preparar o actualizar la integración. La CLI, la integración Codex y los archivos compartidos se actualizaron a 1.0.7 el 15/09/2026. La extensión Git conserva su propia numeración y permanece en 1.0.0.
 
 Los valores de [init-options.json](../.specify/init-options.json) guardan opciones del proyecto y la versión registrada, que la actualización también modifica; para evaluar el estado actual consulta además [integration.json](../.specify/integration.json), los manifiestos de instalación y `specify integration status`. No cambies un número en un JSON para simular una actualización.
 
-**Actualización ya realizada:** se ejecutó `specify integration upgrade codex --force` después de comprobar que las diferencias gestionadas eran únicamente CRLF/LF. La CLI reinstaló los archivos y actualizó los metadatos y manifiestos. Se conservaron los scripts `sh`, las skills, la numeración secuencial y el auto-commit desactivado. No necesitas repetir la actualización para comenzar el tutorial.
+**Actualización ya realizada:** se ejecutaron `specify self upgrade`, `specify integration upgrade codex --force` y `specify extension update git`. La CLI y la integración quedaron en 1.0.7; la extensión Git informó que 1.0.0 ya era su última versión. Se conservaron los scripts `sh`, las skills, la numeración secuencial y el auto-commit desactivado. No necesitas repetir la actualización para comenzar el tutorial.
 
 ### Consultar, actualizar y revisar
 
@@ -288,7 +288,7 @@ specify extension list
 git status --short --branch
 ```
 
-El 07/09/2026, `specify self check` respondió `Up to date: 1.0.4`. Esa consulta es histórica: usa la salida que obtengas ahora para saber si existe otra versión. Los comandos siguientes quedan como referencia para futuras actualizaciones; no son pasos pendientes para llegar a 1.0.4.
+El 15/09/2026, `specify self check` respondió `Up to date: 1.0.7`. Usa siempre la salida que obtengas ahora para saber si existe otra versión.
 
 ```powershell
 # Consulta lo que haría la actualización, sin aplicarla
@@ -343,7 +343,7 @@ for name in ("codex", "speckit"):
 
 **Resultado observado inicial:** Codex: 10 `solo_crlf`; infraestructura: 12 `solo_crlf`; ambos con 0 `otros_o_ausentes`. Esta comprobación no audita los archivos de la extensión Git.
 
-**Resultado tras actualizar a 1.0.4:** Codex: 10 `identicos`; infraestructura: 12 `identicos`; ambos con 0 `solo_crlf` y 0 `otros_o_ausentes`.
+**Resultado tras actualizar a 1.0.7:** `specify integration status` devuelve `OK`, con 0 archivos gestionados modificados, 0 ausentes y 0 rutas inválidas.
 
 Si la actualización de integración se bloquea, los archivos siguen teniendo únicamente esas diferencias y tienes guardado el trabajo que quieras conservar, puedes ejecutar:
 
@@ -370,9 +370,9 @@ Get-Content .specify/extensions/git/git-config.yml
 
 **Revisa:** integración Codex, scripts `sh`, extensión Git habilitada y política de auto-commit conservada. Si Git transforma otra vez los saltos de línea, el aviso puede reaparecer; comprueba su causa. Si una skill no aparece tras actualizarla, vuelve a abrir la sesión para recargar las instrucciones.
 
-**Validación realizada el 08/09/2026:** integración `OK` y comprobaciones de sintaxis Bash superadas. En una copia temporal se verificaron la creación de una funcionalidad, la generación del plan, la preparación de tareas, la resolución de la plantilla de checklist y los prerrequisitos de análisis/convergencia. Los resultados JSON se pudieron leer y la ausencia de `spec.md` se rechazó como corresponde. Estas comprobaciones validan el flujo básico de scripts; no equivalen a ejecutar todas las fases con un agente ni a probar la futura extensión.
+**Validación realizada el 15/09/2026:** `specify version` informa 1.0.7, `specify self check` informa que está al día, `specify check` encuentra Codex CLI, y `specify integration status` devuelve `OK`. Git Bash 5.3, Python 3.13.15 y uv 0.12.15 también responden correctamente. La ausencia de `.specify/feature.json` sigue siendo el único motivo por el que `check-prerequisites.sh` no puede resolver una funcionalidad; es el resultado esperado antes de crear la primera spec.
 
-**Cambios de comportamiento relevantes en 1.0.4:** `analyze` y `converge` comprueban explícitamente la existencia de `spec.md` mediante `--require-spec`; necesitan `spec.md`, `plan.md` y `tasks.md`. Además, `setup-plan.sh` rechaza argumentos desconocidos que antes ignoraba. Las skills instaladas usan los argumentos compatibles y los prompts de este tutorial siguen siendo válidos. La extensión Git 1.0.0 declara `speckit_version: ">=0.2.0"`, requisito que 1.0.4 cumple.
+**Cambios de comportamiento relevantes hasta 1.0.7:** `analyze` y `converge` comprueban explícitamente la existencia de `spec.md` mediante `--require-spec`; necesitan `spec.md`, `plan.md` y `tasks.md`. `setup-plan.sh` usa la clave `FEATURE_DIR`, los scripts normalizan los nombres de rama de forma coherente entre Bash, Python y PowerShell, y la generación de tareas respeta las restricciones de `data-model.md`. Las skills instaladas usan los argumentos compatibles y los prompts de este tutorial siguen siendo válidos. La extensión Git 1.0.0 declara `speckit_version: ">=0.2.0"`, requisito que 1.0.7 cumple.
 
 **Continúa o retoma:** con el diff revisado y el estado entendido. Registra qué versiones utilizas. No describas la extensión como probada por haber pasado `specify check`.
 
@@ -1055,8 +1055,8 @@ el proyecto ni instales herramientas a partir de un comentario de comunidad.
 | `bash` falla o intenta abrir WSL | Ruta del ejecutable | Usa Git Bash mediante su ruta explícita. |
 | Errores `\r` o `bad interpreter` | Finales de línea de los scripts | Pide normalización LF solo de los scripts afectados y revisa el diff; trata la corrección del entorno como cambio separado. |
 | Spec Kit ve modificaciones y Git no | Hashes del manifiesto frente a CRLF/LF | Repite el diagnóstico de la sección 4 antes de considerar `--force`. |
-| `analyze` o `converge` indica que falta `spec.md` | Directorio de funcionalidad activa y sus tres documentos | Recupera la spec correcta o completa la fase pendiente; 1.0.4 comprueba su existencia explícitamente. |
-| `setup-plan.sh` devuelve `Unknown option` | Argumentos del comando | Usa `--json` según la skill; 1.0.4 rechaza argumentos desconocidos. La descripción y las instrucciones van en el prompt de la skill. |
+| `analyze` o `converge` indica que falta `spec.md` | Directorio de funcionalidad activa y sus tres documentos | Recupera la spec correcta o completa la fase pendiente; las versiones actuales comprueban su existencia explícitamente. |
+| `setup-plan.sh` devuelve `Unknown option` | Argumentos del comando | Usa `--json` según la skill; los argumentos desconocidos se rechazan. La descripción y las instrucciones van en el prompt de la skill. |
 | `implement` pregunta por checklists | Casillas pendientes y su significado | Revisa los requisitos y documenta evidencia; no marques que el código funciona por cerrar una checklist. |
 | No hay commits tras una fase | Configuración de auto-commit y hooks | En esta guía son manuales; revisa y guarda el avance. |
 | No hay npm | ¿El plan realmente necesita paquetes? | El ejemplo usa APIs nativas y `node:test`; npm no es requisito de ejecución. |
@@ -1118,4 +1118,4 @@ Marca estos puntos cuando puedas demostrarlos. Esta es una lista del tutorial, n
 
 **Experiencias:** los autores y enlaces de la sección 11 son observaciones personales con aplicación propuesta al tutorial. Los prompts de SightPause, la política de iteración y las decisiones iniciales de producto son ejemplos propios de esta guía. Los requisitos definitivos se guardarán en la constitución y los artefactos de cada funcionalidad cuando recorras el proceso.
 
-Esta revisión actualiza el estado local y las indicaciones afectadas por Spec Kit 1.0.4; conserva la fecha de consulta de las fuentes externas. La actualización y las comprobaciones de infraestructura ejecutadas se detallan en la sección 4. Los demás bloques y ejercicios son instrucciones para el lector; su presencia aquí no acredita que se hayan ejecutado ni que SightPause esté construido.
+Esta revisión actualiza el estado local y las indicaciones afectadas por Spec Kit 1.0.7. La actualización y las comprobaciones de infraestructura ejecutadas se detallan en la sección 4. Los demás bloques y ejercicios son instrucciones para el lector; su presencia aquí no acredita que se hayan ejecutado ni que SightPause esté construido.
